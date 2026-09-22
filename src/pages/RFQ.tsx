@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BUSINESS } from '../data/business'
 import { rfqHash, whatsappOrderLink } from '../lib/engine'
 import { buildOrderMessage, downloadRfqPdf, rfqTotal, type RFQInput } from '../lib/docs'
@@ -15,6 +15,20 @@ const EMPTY: RFQInput = {
 
 export default function RFQ() {
   const [f, setF] = useState<RFQInput>({ ...EMPTY, ref: rfqHash('rfq' + Date.now()) })
+  // Home B2B teaser hands off volume + tax ID via sessionStorage.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('pms-prefill')
+      if (!raw) return
+      const { vol, tax } = JSON.parse(raw)
+      sessionStorage.removeItem('pms-prefill')
+      const qty = Number(vol) || 200
+      setF(f => ({
+        ...f, taxId: tax || f.taxId,
+        items: [{ desc: `Jewel Case Desk Calendars, 300gsm gloss — ${qty} units`, qty, unitPrice: 0.95 }],
+      }))
+    } catch { /* no prefill */ }
+  }, [])
   const [err, setErr] = useState('')
   const [hash, setHash] = useState('')
   const total = rfqTotal(f)

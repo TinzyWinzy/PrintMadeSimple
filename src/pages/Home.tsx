@@ -1,88 +1,232 @@
-import { Link } from 'react-router-dom'
-import { BUSINESS } from '../data/business'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { BUSINESS, PRODUCTS } from '../data/business'
+import { catalogPrice, jewelCasePrice } from '../lib/engine'
+import { db } from '../lib/db'
 import jewelFlyer from '../assets/jewel-flyer.webp'
-import a3Flyer from '../assets/a3-flyer.webp'
+
+const WA = (msg: string) => `https://wa.me/${BUSINESS.primaryWhatsapp.replace('+', '')}?text=${encodeURIComponent(msg)}`
 
 function Stamp({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-block border-2 border-neutral-900 rounded px-2 py-0.5 text-[11px] font-black uppercase tracking-wider -rotate-1">
+    <span className="inline-block border-2 border-neutral-900 rounded px-2 py-0.5 text-[11px] font-black uppercase tracking-wider -rotate-1 bg-white">
       {children}
     </span>
   )
 }
 
-function PriceCard({ to, name, spec, price, action }: { to: string; name: string; spec: string; price: string; action: string }) {
-  return (
-    <Link to={to} className="flex items-center gap-3 border rounded-2xl p-3 bg-white active:bg-neutral-50 min-h-[76px]">
-      <span className="flex-1">
-        <span className="font-bold block text-[15px] leading-tight">{name}</span>
-        <span className="text-xs text-neutral-500 block">{spec}</span>
-      </span>
-      <span className="text-right shrink-0">
-        <span className="font-black block text-[15px]">{price}</span>
-        <span className="text-xs font-bold text-[#E30613]">{action} →</span>
-      </span>
-    </Link>
-  )
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return <h2 className="font-black text-lg tracking-tight">{children}</h2>
 }
 
 export default function Home() {
-  const wa = `https://wa.me/${BUSINESS.primaryWhatsapp.replace('+', '')}?text=${encodeURIComponent('Hello Print Made Simple! I want to order.')}`
   return (
-    <div className="space-y-4 pb-24">
-      {/* 1 · Proof: real work, real address */}
-      <section aria-label="Featured product">
-        <img src={jewelFlyer} alt="Jewel Case Desk Calendar samples printed by Print Made Simple" className="w-full rounded-2xl border" fetchPriority="high" />
-        <div className="flex flex-wrap gap-1.5 mt-2">
-          <Stamp>300gsm gloss/matt</Stamp>
-          <Stamp>Start any month · $0 extra</Stamp>
-          <Stamp>Shop 4B Regal Star Mall</Stamp>
-        </div>
-      </section>
-
-      {/* 2 · One primary CTA */}
-      <section aria-label="Design your calendar">
-        <h1 className="text-[26px] leading-[1.15] font-black tracking-tight">
-          Your logo on your client's desk, 365&nbsp;days.
-        </h1>
-        <p className="text-sm text-neutral-600 mt-1">
-          Jewel Case Desk Calendars from <strong className="text-neutral-900">USD 1.10/unit</strong> at 100 units. Logo on every page. Design it on your phone, even offline.
-        </p>
-        <Link to="/customizer" className="block bg-[#E30613] text-white text-center rounded-full py-3.5 mt-3 font-black text-base min-h-[52px]">
-          Design my calendar
-        </Link>
-      </section>
-
-      {/* 3 · Price-anchored strip */}
-      <section aria-label="Popular products" className="space-y-2">
-        <h2 className="font-bold text-sm uppercase tracking-wide text-neutral-500">Popular right now</h2>
-        <PriceCard to="/customizer" name="Jewel Case Calendar" spec="12mo · back-to-back · case = stand" price="from $1.10/u" action="Design" />
-        <div className="flex gap-2">
-          <img src={a3Flyer} alt="A3 Desk Calendar 2026" className="w-20 h-20 rounded-xl border object-cover shrink-0" loading="lazy" />
-          <div className="flex-1">
-            <PriceCard to="/catalog" name="A3 Desk Calendar" spec="Wiro-bound · corporates & churches" price="from $3.50/u" action="Price" />
-          </div>
-        </div>
-        <PriceCard to="/catalog" name="QR Business Cards" spec="100 cards · scannable · 24–48h" price="from $8.00" action="Price" />
-      </section>
-
-      {/* 4 · Secondary B2B path */}
-      <section aria-label="Corporate quotes" className="bg-neutral-950 text-white rounded-2xl p-4">
-        <p className="font-black">Tenders & bulk orders</p>
-        <p className="text-sm opacity-80 mt-0.5">PRAZ-ready hashed quote in minutes. ITF263 checked before you send.</p>
-        <Link to="/rfq" className="block bg-white text-neutral-900 text-center rounded-full py-2.5 mt-3 font-bold text-sm min-h-[44px]">
-          Get a compliant quote
-        </Link>
-      </section>
-
-      {/* 5 · Sticky thumb-reach order bar */}
+    <div className="space-y-6 pb-24">
+      <UtilityBar />
+      <Hero />
+      <Showcase />
+      <B2BTeaser />
+      <CategoryGrid />
+      <TrustStrip />
+      <TrackerTeaser />
+      <InstallCard />
       <div className="fixed bottom-0 inset-x-0 no-print">
         <div className="max-w-3xl mx-auto px-4 pb-4 pt-6 bg-gradient-to-t from-white via-white to-transparent">
-          <a href={wa} className="block bg-green-600 text-white text-center rounded-full py-3 font-black min-h-[52px]">
+          <a href={WA('Hello Print Made Simple! I want to order.')} className="block bg-green-600 text-white text-center rounded-full py-3 font-black min-h-[52px]">
             WhatsApp {BUSINESS.phones[0].display}
           </a>
         </div>
       </div>
     </div>
+  )
+}
+
+/* 1 · Utility bar */
+function UtilityBar() {
+  return (
+    <div className="bg-slate-100 border rounded-2xl px-3 py-2 text-xs space-y-0.5 -mt-1">
+      <p className="font-bold">Shop 4B Basement, Regal Star Mall, George Silundika Ave, Harare CBD</p>
+      <p className="text-neutral-600">{BUSINESS.phones[0].display} · USD & ZiG · EcoCash · InnBucks · O'Mari</p>
+    </div>
+  )
+}
+
+/* 3 · Hero with 3-way actions */
+function Hero() {
+  return (
+    <section aria-label="Start an order">
+      <h1 className="text-[28px] leading-[1.12] font-black tracking-tight">
+        Precision printing & branding — simple, fast, offline-ready.
+      </h1>
+      <p className="text-sm text-neutral-600 mt-1.5">
+        From <strong className="text-neutral-900">300gsm Jewel Case Desk Calendars</strong> to tender-compliant corporate stationery, printed in Harare CBD.
+      </p>
+      <div className="space-y-2 mt-3">
+        <Link to="/customizer" className="block bg-[#E30613] text-white rounded-2xl p-3.5 min-h-[64px]">
+          <span className="font-black block">Design a 365-day calendar</span>
+          <span className="text-sm opacity-90">Custom start month, logo on every page — start designing →</span>
+        </Link>
+        <div className="grid grid-cols-2 gap-2">
+          <Link to="/rfq" className="block border-2 border-neutral-900 rounded-2xl p-3 min-h-[64px]">
+            <span className="font-black block text-sm">B2B tender quote</span>
+            <span className="text-xs text-neutral-600">Hashed PDF in minutes →</span>
+          </Link>
+          <a href={WA('Hello! I have print-ready artwork to send.')} className="block border-2 border-neutral-900 rounded-2xl p-3 min-h-[64px]">
+            <span className="font-black block text-sm">Have artwork?</span>
+            <span className="text-xs text-neutral-600">Send it on WhatsApp →</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* 4 · Featured product showcase */
+function Showcase() {
+  return (
+    <section aria-label="Jewel Case Desk Calendar" className="space-y-2">
+      <SectionTitle>Jewel Case Desk Calendar</SectionTitle>
+      <img src={jewelFlyer} alt="Jewel Case Desk Calendar samples printed by Print Made Simple" className="w-full rounded-2xl border" loading="lazy" />
+      <ul className="grid grid-cols-2 gap-1.5 text-xs">
+        {['300gsm gloss or matt', 'Any start month, $0 extra', 'Logo on all 12 pages', '4 special dates / month'].map(s => (
+          <li key={s} className="bg-slate-100 rounded-xl px-2.5 py-2 font-semibold">{s}</li>
+        ))}
+      </ul>
+      <div className="flex items-center gap-2">
+        <span className="font-black text-lg">from USD {jewelCasePrice(100, 12, 'gloss').toFixed(2)}</span>
+        <span className="text-xs text-neutral-500">/ 100 units</span>
+        <Link to="/customizer" className="ml-auto bg-neutral-900 text-white rounded-full px-5 py-2.5 text-sm font-bold min-h-[44px]">Customize →</Link>
+      </div>
+    </section>
+  )
+}
+
+/* 5 · B2B mini-form → prefilled RFQ */
+function B2BTeaser() {
+  const nav = useNavigate()
+  const [vol, setVol] = useState('200')
+  const [tax, setTax] = useState('')
+  return (
+    <section aria-label="Corporate quotes" className="bg-neutral-950 text-white rounded-2xl p-4 space-y-2.5">
+      <p className="text-[11px] font-black uppercase tracking-widest text-red-300">{BUSINESS.name}</p>
+      <SectionTitle>Corporate & tender quotes</SectionTitle>
+      <p className="text-sm opacity-80">PRAZ-ready hashed PDF. ZIMRA clearance checked before anything is finalized.</p>
+      <div className="grid grid-cols-2 gap-2">
+        <label className="text-xs">1 · Volume
+          <select value={vol} onChange={e => setVol(e.target.value)} className="text-neutral-900 rounded-lg w-full p-2.5 mt-1 font-bold">
+            <option value="100">±100 units</option>
+            <option value="200">±200 units</option>
+            <option value="500">±500 units</option>
+            <option value="1000">1000+ units</option>
+          </select>
+        </label>
+        <label className="text-xs">2 · Company Tax ID
+          <input value={tax} onChange={e => setTax(e.target.value)} placeholder="e.g. 20001234" className="text-neutral-900 rounded-lg w-full p-2.5 mt-1 font-bold" />
+        </label>
+      </div>
+      <button
+        onClick={() => { sessionStorage.setItem('pms-prefill', JSON.stringify({ vol, tax })); nav('/rfq') }}
+        className="w-full bg-[#E30613] rounded-full py-3 font-black min-h-[52px]">
+        3 · Continue to compliant quote →
+      </button>
+    </section>
+  )
+}
+
+/* 6 · Category grid with from-prices */
+const GRID: { id: string; blurb: string }[] = [
+  { id: 'jewel-12', blurb: 'Stand included' },
+  { id: 'bc-qr', blurb: 'Links to your vCard' },
+  { id: 'flyer-a5', blurb: 'Bulk breaks' },
+  { id: 'sticker-vinyl', blurb: 'Die-cut shapes' },
+  { id: 'banner-pvc', blurb: 'Events & shops' },
+  { id: 'corp-tshirt', blurb: 'Staff & promos' },
+]
+
+function CategoryGrid() {
+  return (
+    <section aria-label="Product categories" className="space-y-2">
+      <SectionTitle>What we print</SectionTitle>
+      <div className="grid grid-cols-2 gap-2">
+        {GRID.map(g => {
+          const p = PRODUCTS.find(x => x.id === g.id)!
+          return (
+            <Link key={g.id} to="/catalog" className="border rounded-2xl p-3 bg-white min-h-[96px] flex flex-col">
+              <span className="font-bold text-sm leading-tight">{p.name}</span>
+              <span className="text-xs text-neutral-500">{g.blurb}</span>
+              <span className="mt-auto pt-1 font-black text-sm">from ${catalogPrice(p.basePriceUSD, p.minQty).toFixed(2)}</span>
+            </Link>
+          )
+        })}
+      </div>
+    </section>
+  )
+}
+
+/* 7 · Trust, fulfillment, payments */
+function TrustStrip() {
+  return (
+    <section aria-label="Trust and payments" className="space-y-2">
+      <SectionTitle>Collect with confidence</SectionTitle>
+      <div className="flex flex-wrap gap-1.5">
+        <Stamp>Express pickup · Shop 4B</Stamp>
+        <Stamp>Delivery arranged on WhatsApp</Stamp>
+        <Stamp>300 DPI pre-flight check</Stamp>
+      </div>
+      <div className="border rounded-2xl p-3 text-sm">
+        <p className="font-bold text-xs uppercase tracking-wide text-neutral-500">We accept</p>
+        <p className="font-black mt-0.5">EcoCash · InnBucks · O'Mari · USD cash</p>
+      </div>
+    </section>
+  )
+}
+
+/* 8 · Tracker teaser — real IndexedDB lookup */
+const STAGES = ['Received', 'Proof ready', 'In production', 'Ready at Shop 4B']
+
+function TrackerTeaser() {
+  const [q, setQ] = useState('')
+  const [res, setRes] = useState<string | null>(null)
+  async function lookup(e: React.FormEvent) {
+    e.preventDefault()
+    const ref = q.trim().toUpperCase()
+    if (!ref) return
+    const hit = await db.designs.where('ref').equalsIgnoreCase(ref).first()
+    if (!hit) { setRes(`No order ${ref} on this device yet — it may live on another phone or with Shop 4B.`); return }
+    const stage = Math.min(STAGES.length - 1, hit.payload?.stage ?? 0)
+    setRes(`${hit.kind} ${hit.ref}: ${STAGES[stage]}${hit.payload?.pickupToken ? ` · pickup ${hit.payload.pickupToken}` : ''}`)
+  }
+  return (
+    <section aria-label="Track your order" className="border rounded-2xl p-3.5 space-y-2">
+      <SectionTitle>Where's my order?</SectionTitle>
+      <form onSubmit={lookup} className="flex gap-2">
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Order ref e.g. PMS-..." className="border rounded-full px-3.5 py-2.5 text-sm flex-1 font-mono min-h-[48px]" aria-label="Order reference" />
+        <button className="bg-neutral-900 text-white rounded-full px-5 font-bold text-sm min-h-[48px]">Check</button>
+      </form>
+      {res && <p className="text-sm bg-slate-100 rounded-xl px-3 py-2">{res}</p>}
+      <Link to="/track" className="text-sm font-bold text-[#E30613]">Open full tracker →</Link>
+    </section>
+  )
+}
+
+/* 9 · PWA install */
+function InstallCard() {
+  const [deferred, setDeferred] = useState<any>(null)
+  const [done, setDone] = useState(false)
+  useEffect(() => {
+    const h = (e: Event) => { e.preventDefault(); setDeferred(e) }
+    window.addEventListener('beforeinstallprompt', h)
+    return () => window.removeEventListener('beforeinstallprompt', h)
+  }, [])
+  if (!deferred || done) return null
+  return (
+    <section className="bg-red-50 border border-red-200 rounded-2xl p-3.5 flex items-center gap-3 no-print">
+      <p className="text-sm flex-1"><strong>Install the app</strong> for offline catalog + calendar designer.</p>
+      <button
+        onClick={async () => { await deferred.prompt(); setDone(true) }}
+        className="bg-[#E30613] text-white rounded-full px-5 py-2.5 text-sm font-bold shrink-0 min-h-[44px]">
+        Install
+      </button>
+    </section>
   )
 }
