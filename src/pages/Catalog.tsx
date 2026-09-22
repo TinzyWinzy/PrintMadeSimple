@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { PRODUCTS, BUSINESS, type Product } from '../data/business'
 import { catalogPrice, whatsappOrderLink } from '../lib/engine'
-import { buildOrderMessage } from '../lib/docs'
+import { buildOrderMessage } from '../lib/docs-core'
 import { pickupToken } from '../lib/security'
 import { saveDesign } from '../lib/db'
 

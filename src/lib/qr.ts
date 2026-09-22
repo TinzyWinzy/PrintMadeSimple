@@ -29,5 +29,6 @@ export function qrUrl(id: string): string {
 }
 
 export async function qrDataUrl(text: string, size = 180): Promise<string> {
+  const QRCode = (await import('qrcode')).default
   return QRCode.toDataURL(text, { width: size, margin: 1, errorCorrectionLevel: 'M' })
 }

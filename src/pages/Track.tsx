@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { db, saveDesign, type SavedDesign } from '../lib/db'
+import { deleteDesign, listDesigns, saveDesign, type SavedDesign } from '../lib/db'
 import { BUSINESS } from '../data/business'
 import { rfqHash, whatsappOrderLink } from '../lib/engine'
-import { buildOrderMessage } from '../lib/docs'
+import { buildOrderMessage } from '../lib/docs-core'
 import { validPickupToken } from '../lib/security'
 
 const STAGES = ['Order Received / RFQ Submitted', 'Digital Proof Ready', 'Production Commenced', 'Ready for Collection (Harare hub)']
@@ -14,7 +14,7 @@ export default function Track() {
   const [online, setOnline] = useState(navigator.onLine)
   const [tokenInput, setTokenInput] = useState<Record<number, string>>({})
 
-  async function load() { setItems(await db.designs.orderBy('updatedAt').reverse().toArray()) }
+  async function load() { setItems(await listDesigns()) }
   useEffect(() => {
     load()
     const on = () => setOnline(true), off = () => setOnline(false)
@@ -63,7 +63,7 @@ export default function Track() {
               <a className="bg-green-600 text-white rounded-full py-1.5 text-center font-bold" href={whatsappOrderLink(buildOrderMessage(it.kind, it.ref, JSON.stringify(it.payload).slice(0, 800)))}>WhatsApp send</a>
               <button className="border rounded-full py-1.5 font-bold" onClick={() => advance(it)}>Advance stage</button>
               {it.kind === 'rfq' && <button className="border rounded-full py-1.5 font-bold" onClick={() => renew(it)}>Renew / amend</button>}
-              <button className="border rounded-full py-1.5 font-bold" onClick={async () => { await db.designs.delete(it.id!); load() }}>Delete</button>
+              <button className="border rounded-full py-1.5 font-bold" onClick={async () => { if (it.id) await deleteDesign(it.id); load() }}>Delete</button>
             </div>
             {it.status !== 'collected' && (
               <form className="flex gap-2 mt-2 no-print" onSubmit={e => { e.preventDefault(); collect(it) }}>

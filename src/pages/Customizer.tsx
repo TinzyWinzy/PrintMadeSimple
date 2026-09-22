@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { MONTHS, ZIM_HOLIDAYS_2026, monthGrid, monthYearForOffset } from '../data/holidays'
 import { STOCK_OPTIONS, BUSINESS } from '../data/business'
 import { DEFAULT_CALENDAR, jewelCasePrice, rfqHash, whatsappOrderLink, type CalendarConfig } from '../lib/engine'
-import { buildCalendarSummary, buildOrderMessage, downloadCalendarProof, fileToDataUrl } from '../lib/docs'
+import { buildCalendarSummary, buildOrderMessage, fileToDataUrl } from '../lib/docs-core'
 import { probeImage, preflightDpi, cmykSoftProof, type Preflight } from '../lib/preflight'
 import { newQrId, qrUrl, qrDataUrl } from '../lib/qr'
 import { pickupToken } from '../lib/security'
@@ -109,7 +109,13 @@ export default function Customizer() {
     setCmykUrl(cmykSoftProof(cv).toDataURL())
   }
 
+  async function downloadProof() {
+    const { downloadCalendarProof } = await import('../lib/docs')
+    downloadCalendarProof(cfg, ref, qrImg, qrId ? qrUrl(qrId) : '')
+  }
+
   const summary = buildCalendarSummary(cfg, qty, total)
+
   const token = useMemo(() => pickupToken(ref), [ref])
   const waLink = whatsappOrderLink(buildOrderMessage('Jewel Case Calendar', ref, summary + `\nCover:${cfg.coverType} Preflight:${pf ? pf.verdict : 'logo pending'} QR:${qrId ? qrUrl(qrId) : 'none'} Pickup:${token}`))
 
@@ -211,7 +217,7 @@ export default function Customizer() {
         </div>
         <p className="text-xs text-neutral-500">Ref {ref} · min 25 · matt +5% · 15/18-mo pro-rata · USD indicative · pickup token {token}.</p>
         <div className="grid grid-cols-2 gap-2 no-print">
-          <button className="border rounded-full py-2 text-sm font-bold" onClick={() => downloadCalendarProof(cfg, ref, qrImg, qrId ? qrUrl(qrId) : '')}>Download proof PDF</button>
+          <button className="border rounded-full py-2 text-sm font-bold" onClick={downloadProof}>Download proof PDF</button>
           <a className="bg-green-600 text-white rounded-full py-2 text-sm font-bold text-center" href={waLink}>WhatsApp order</a>
           <a className="border rounded-full py-2 text-sm font-bold text-center" href={`mailto:${BUSINESS.emails[0]}?subject=${encodeURIComponent(`Jewel Calendar order ${ref}`)}&body=${encodeURIComponent(summary + `\nPickup: ${token}`)}`}>Email order</a>
           <button className="border rounded-full py-2 text-sm font-bold" onClick={() => { saveDesign({ kind: 'jewel-calendar', ref, payload: { cfg, qty, total, pickupToken: token, qr: qrId ? { id: qrId, target: qrTarget } : null, preflight: pf?.verdict || 'logo pending' }, status: 'queued' }); alert(`Saved offline. Pickup token ${token} — show it at Shop 4B.`) }}>Save offline</button>

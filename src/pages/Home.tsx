@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { BUSINESS, PRODUCTS } from '../data/business'
 import { catalogPrice, jewelCasePrice } from '../lib/engine'
-import { db } from '../lib/db'
+import { findDesignByRef } from '../lib/db'
 import { useReveals } from '../lib/reveal'
 import jewelFlyer from '../assets/jewel-flyer.webp'
 
@@ -14,6 +14,11 @@ export default function Home() {
     <div className="pb-24 breakout">
       <UtilityStrip />
       <Hero />
+      <div className="max-w-3xl mx-auto px-4 pb-4 pt-6">
+        <a href={WA('Hello Print Made Simple! I want to order.')} className="block bg-green-600 text-white text-center rounded-sm py-3 font-black min-h-[52px]">
+          WHATSAPP {BUSINESS.phones[0].display}
+        </a>
+      </div>
       <Ticker />
       <Showcase />
       <B2BSteps />
@@ -21,13 +26,6 @@ export default function Home() {
       <TrustFoot />
       <TrackerBand />
       <InstallCard />
-      <div className="fixed bottom-0 inset-x-0 no-print">
-        <div className="max-w-3xl mx-auto px-4 pb-4 pt-6 bg-gradient-to-t from-white via-white to-transparent">
-          <a href={WA('Hello Print Made Simple! I want to order.')} className="block bg-green-600 text-white text-center rounded-sm py-3 font-black min-h-[52px]">
-            WHATSAPP {BUSINESS.phones[0].display}
-          </a>
-        </div>
-      </div>
     </div>
   )
 }
@@ -225,7 +223,7 @@ function TrackerBand() {
     e.preventDefault()
     const ref = q.trim().toUpperCase()
     if (!ref) return
-    const hit = await db.designs.where('ref').equalsIgnoreCase(ref).first()
+    const hit = await findDesignByRef(ref)
     if (!hit) { setRes(`No ${ref} on this device — it may live on another phone or with Shop 4B.`); return }
     const stage = Math.min(STAGES.length - 1, hit.payload?.stage ?? 0)
     setRes(`${hit.kind} ${hit.ref} — ${STAGES[stage]}${hit.payload?.pickupToken ? ` · pickup ${hit.payload.pickupToken}` : ''}`)

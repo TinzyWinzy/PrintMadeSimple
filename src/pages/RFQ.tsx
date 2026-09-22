@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { BUSINESS } from '../data/business'
 import { rfqHash, whatsappOrderLink } from '../lib/engine'
-import { buildOrderMessage, downloadRfqPdf, rfqTotal, type RFQInput } from '../lib/docs'
+import { buildOrderMessage, rfqTotal, type RFQInput } from '../lib/docs-core'
+import { downloadRfqPdf } from '../lib/docs'
 import { canonicalQuote, checkZimra, sha256Hex, pickupToken } from '../lib/security'
 import { qrDataUrl } from '../lib/qr'
 import { pushQuote } from '../lib/sync'
@@ -54,6 +55,7 @@ export default function RFQ() {
     const status = queueOnly ? 'queued' : server?.ok ? 'sent' : 'queued'
     saveDesign({ kind: 'rfq', ref: f.ref, payload: { ...f, quoteHash: h, pickupToken: token, serverSealed: server?.ok || false }, status })
     if (!queueOnly) {
+      const { downloadRfqPdf } = await import('../lib/docs')
       downloadRfqPdf(f, h, qr)
       window.location.href = whatsappOrderLink(buildOrderMessage('RFQ', f.ref, `${f.company} · ${f.items.length} lines · USD ${total.toFixed(2)} · ITF263:${f.itf263Ref} · hash:${h.slice(0, 12)}… · pickup:${token}`))
     } else alert(`RFQ ${f.ref} saved offline (hash ${h.slice(0, 12)}…). Send from Track when online. [server: ${server?.ok ? 'sealed' : server?.error || 'unreachable'}]`)
