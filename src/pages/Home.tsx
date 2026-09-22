@@ -3,11 +3,13 @@ import { Link, useNavigate } from 'react-router-dom'
 import { BUSINESS, PRODUCTS } from '../data/business'
 import { catalogPrice, jewelCasePrice } from '../lib/engine'
 import { db } from '../lib/db'
+import { useReveals } from '../lib/reveal'
 import jewelFlyer from '../assets/jewel-flyer.webp'
 
 const WA = (msg: string) => `https://wa.me/${BUSINESS.primaryWhatsapp.replace('+', '')}?text=${encodeURIComponent(msg)}`
 
 export default function Home() {
+  useReveals()
   return (
     <div className="pb-24">
       <UtilityStrip />
@@ -47,14 +49,14 @@ function Hero() {
       <div className="relative grid gap-6 sm:grid-cols-[1.2fr_1fr] sm:items-end">
         <div>
           <p className="kicker text-red-400">Designing · Printing · Branding</p>
-          <h1 className="display mt-2">
+          <h1 className="display mt-2 hero-in">
             INK ON<br />PAPER.<br />
             <span className="text-[#FF3B47]">BRAND ON</span><br />DESKS.
           </h1>
-          <p className="text-sm text-neutral-300 mt-3 max-w-[34ch]">
+          <p className="text-sm text-neutral-300 mt-3 max-w-[34ch] hero-in hero-in-d1">
             300gsm Jewel Case Desk Calendars and tender-ready corporate print — made in Harare CBD, ordered from your phone.
           </p>
-          <div className="flex flex-wrap gap-2 mt-4">
+          <div className="flex flex-wrap gap-2 mt-4 hero-in hero-in-d2">
             <Link to="/customizer" className="bg-[#E30613] text-white font-black px-6 py-3 min-h-[52px] inline-flex items-center">
               DESIGN A CALENDAR
             </Link>
@@ -104,7 +106,7 @@ const SPECS = [
 
 function Showcase() {
   return (
-    <section aria-label="Jewel Case Desk Calendar" className="pt-8">
+    <section aria-label="Jewel Case Desk Calendar" className="pt-8 rv">
       <p className="kicker text-[#E30613]">Flagship — 365-day advertising stand</p>
       <h2 className="display mt-1" style={{ fontSize: 'clamp(2rem, 1.2rem + 7vw, 3.2rem)' }}>THE JEWEL<br />CASE CALENDAR</h2>
       <div className="grid gap-4 mt-4 sm:grid-cols-[1fr_1.1fr]">
@@ -133,7 +135,7 @@ function B2BSteps() {
   const [vol, setVol] = useState('200')
   const [tax, setTax] = useState('')
   return (
-    <section aria-label="Corporate quotes" className="bg-slate-100 -mx-4 px-4 py-8 mt-8">
+    <section aria-label="Corporate quotes" className="bg-slate-100 -mx-4 px-4 py-8 mt-8 rv">
       <p className="kicker text-neutral-500">{BUSINESS.name}</p>
       <h2 className="display mt-1" style={{ fontSize: 'clamp(1.9rem, 1.1rem + 6vw, 2.8rem)' }}>TENDER-READY<br />IN 3 STEPS</h2>
       <div className="grid gap-2 mt-4 sm:grid-cols-3">
@@ -169,7 +171,7 @@ const GRID = ['jewel-12', 'bc-qr', 'flyer-a5', 'sticker-vinyl', 'banner-pvc', 'c
 
 function Index() {
   return (
-    <section aria-label="Product index" className="pt-8">
+    <section aria-label="Product index" className="pt-8 rv">
       <p className="kicker text-[#E30613]">Full range</p>
       <h2 className="display mt-1" style={{ fontSize: 'clamp(1.9rem, 1.1rem + 6vw, 2.8rem)' }}>PRICE INDEX</h2>
       <ul className="mt-2 border-t-2 border-neutral-900">
@@ -194,7 +196,7 @@ function Index() {
 /* 7 · Trust footnote */
 function TrustFoot() {
   return (
-    <section aria-label="Trust and payments" className="border-t-2 border-neutral-900 mt-8 pt-3">
+    <section aria-label="Trust and payments" className="border-t-2 border-neutral-900 mt-8 pt-3 rv">
       <div className="grid gap-3 sm:grid-cols-2 text-sm">
         <div>
           <p className="kicker text-neutral-500">Fulfillment</p>
@@ -227,7 +229,7 @@ function TrackerBand() {
     setRes(`${hit.kind} ${hit.ref} — ${STAGES[stage]}${hit.payload?.pickupToken ? ` · pickup ${hit.payload.pickupToken}` : ''}`)
   }
   return (
-    <section aria-label="Track your order" className="bg-neutral-950 text-white -mx-4 px-4 py-8 mt-8">
+    <section aria-label="Track your order" className="bg-neutral-950 text-white -mx-4 px-4 py-8 mt-8 rv">
       <p className="kicker text-red-400">Production tracker</p>
       <h2 className="display mt-1" style={{ fontSize: 'clamp(1.9rem, 1.1rem + 6vw, 2.8rem)' }}>WHERE'S<br />MY ORDER?</h2>
       <form onSubmit={lookup} className="flex gap-2 mt-4">

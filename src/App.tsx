@@ -37,7 +37,7 @@ function Shell({ children }: { children: React.ReactNode }) {
             <Link to="/" className="flex items-center gap-2.5 flex-1 min-w-0" aria-label="Print Made Simple home">
               <span className="bg-white text-[#E30613] font-black px-2 py-1 text-xl leading-none">PMS</span>
               <span className="min-w-0 leading-none">
-                <span className="block font-black tracking-tighter text-xl sm:text-2xl truncate">PRINT MADE SIMPLE</span>
+                <span className="block font-display tracking-tight text-xl sm:text-2xl truncate">PRINT MADE SIMPLE</span>
                 <span className="hidden sm:block text-[11px] font-bold uppercase tracking-[0.2em] opacity-80 mt-0.5">{BUSINESS.tagline}</span>
               </span>
             </Link>

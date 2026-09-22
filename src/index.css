@@ -7,7 +7,13 @@
 }
 
 html { -webkit-tap-highlight-color: transparent; }
-body { @apply bg-white text-neutral-900 antialiased; }
+body { @apply bg-white text-neutral-900 antialiased; font-family: Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
+
+/* Display face — Archivo Black when network allows, system black fallback */
+.display, .font-display {
+  font-family: "Archivo Black", "Arial Black", system-ui, sans-serif;
+  font-weight: 400;
+}
 
 /* Gloss vs Matt stock simulation */
 .stock-gloss { filter: saturate(1.15) contrast(1.06); }
@@ -18,8 +24,7 @@ body { @apply bg-white text-neutral-900 antialiased; }
 
 /* Editorial display type — oversized, tight, left-aligned */
 .display {
-  font-weight: 900;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.01em;
   line-height: 0.95;
   font-size: clamp(2.6rem, 1.4rem + 9vw, 4.5rem);
 }
@@ -45,8 +50,26 @@ body { @apply bg-white text-neutral-900 antialiased; }
   width: max-content;
   animation: pms-marquee 28s linear infinite;
 }
+/* Scroll reveals — IntersectionObserver adds .rv-in; gated for motion/data savers */
+.rv { opacity: 0; transform: translateY(18px); }
+.rv-in { opacity: 1; transform: none; transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.rv-d1 { transition-delay: 0.08s; }
+.rv-d2 { transition-delay: 0.16s; }
+
+/* Hero entrance */
+@keyframes pms-rise {
+  from { opacity: 0; transform: translateY(26px); }
+  to { opacity: 1; transform: none; }
+}
+.hero-in { animation: pms-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.hero-in-d1 { animation-delay: 0.1s; }
+.hero-in-d2 { animation-delay: 0.22s; }
+
 @media (prefers-reduced-motion: reduce) {
   .marquee-track { animation: none; }
+  .rv { opacity: 1; transform: none; }
+  .rv-in { transition: none; }
+  .hero-in, .hero-in-d1, .hero-in-d2 { animation: none; }
 }
 
 /* Dot-grid texture (Traamand-style, pure CSS) */
