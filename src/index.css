@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #e30613;
+  --color-brand-dark: #a8040e;
+  --color-ink: #141414;
+}
+
+html { -webkit-tap-highlight-color: transparent; }
+body { @apply bg-white text-neutral-900 antialiased; }
+
+/* Gloss vs Matt stock simulation */
+.stock-gloss { filter: saturate(1.15) contrast(1.06); }
+.stock-gloss::after { content: ""; }
+.stock-matt { filter: saturate(0.94) contrast(0.97); }
+
+.calendar-grid { font-variant-numeric: tabular-nums; }
+
+@media print {
+  .no-print { display: none !important; }
+}

@@ -1,0 +1,68 @@
+// POST /api/quotes — server-side quote intake (SAD v2 §2 + §7).
+// Recomputes the SHA-256 over the canonical payload and REJECTS tampered
+// submissions (409). ZIMRA cross-reference + COMPLIANT sealing happen here
+// once the verification integration lands; until then the client gate
+// (format + expiry) is enforced again server-side. Persists to Neon via Prisma.
+import { PrismaNeon } from '@prisma/adapter-neon'
+import { PrismaClient } from '@prisma/client'
+import { canonicalQuote, checkZimra, sha256Hex } from '../src/lib/security'
+
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
+
+function prisma() {
+  if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not set')
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = new PrismaClient({
+      adapter: new PrismaNeon({ connectionString: process.env.DATABASE_URL }),
+    })
+  }
+  return globalForPrisma.prisma
+}
+
+export default async function handler(req: Request) {
+  if (req.method !== 'POST') return Response.json({ error: 'POST only' }, { status: 405 })
+  let body: any
+  try {
+    body = await req.json()
+  } catch {
+    return Response.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+
+  const { ref, company, contactPerson, phone, email, taxId, itf263Ref, itf263Expiry, delivery, items, notes, clientHash } = body ?? {}
+  if (!ref || !company || !contactPerson || !phone || !email || !Array.isArray(items) || items.length === 0) {
+    return Response.json({ error: 'Missing required fields' }, { status: 400 })
+  }
+  const zimra = checkZimra(String(itf263Ref || ''), String(itf263Expiry || ''))
+  if (!zimra.ok) return Response.json({ error: `Non-Compliant: ${zimra.reason}`, zimra }, { status: 422 })
+
+  const canonical = canonicalQuote({ ref, company, contactPerson, phone, email, taxId: taxId || '', itf263Ref, delivery, items, notes: notes || '' })
+  const hash = await sha256Hex(canonical)
+  if (clientHash && clientHash !== hash) {
+    return Response.json({ error: 'Integrity mismatch — payload differs from signed hash', hash }, { status: 409 })
+  }
+
+  try {
+    const db = prisma()
+    const totalUsd = Math.round(items.reduce((s: number, i: any) => s + Number(i.qty) * Number(i.unitPrice), 0) * 100) / 100
+    // Upsert account by email (guest-friendly), then seal the quote.
+    const account = await db.account.upsert({
+      where: { email },
+      update: { company, contactPerson, phone, taxId: taxId || null, itf263Ref, itf263Expiry: itf263Expiry ? new Date(itf263Expiry) : null },
+      create: { company, contactPerson, phone, email, taxId: taxId || null, itf263Ref, itf263Expiry: itf263Expiry ? new Date(itf263Expiry) : null },
+    })
+    const quote = await db.quote.upsert({
+      where: { id: ref },
+      update: {},
+      create: {
+        id: ref, accountId: account.id,
+        payload: { company, contactPerson, phone, email, taxId, itf263Ref, itf263Expiry, delivery, items, notes } as any,
+        totalUsd, hash, status: 'COMPLIANT',
+      },
+    })
+    return Response.json({ ok: true, ref: quote.id, hash, totalUsd })
+  } catch (e: any) {
+    const msg = String(e?.message || e)
+    if (msg.includes('DATABASE_URL')) return Response.json({ error: 'Database not configured (DATABASE_URL missing)' }, { status: 503 })
+    return Response.json({ error: 'Database error', detail: msg.slice(0, 300) }, { status: 500 })
+  }
+}

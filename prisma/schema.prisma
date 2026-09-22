@@ -1,0 +1,123 @@
+// SAD v2 §7 — server-side relational backbone (PostgreSQL/Prisma).
+// The PWA is the offline-first client: IndexedDB (src/lib/db.ts) mirrors these
+// tables locally and syncs idempotently when online. Wire with:
+//   npm i -D prisma && npx prisma migrate dev
+// RBAC: CLIENT < DESIGNER < ADMIN (SAD v1 §7.1, SAD v2 §7).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CLIENT
+  DESIGNER
+  ADMIN
+}
+
+enum QuoteStatus {
+  DRAFT
+  COMPLIANT // ZIMRA gate passed, SHA-256 sealed
+  SUPERSEDED // replaced by renewal/amendment
+}
+
+enum OrderStage {
+  RECEIVED
+  PROOF_READY
+  IN_PRODUCTION
+  READY_FOR_PICKUP
+  COLLECTED
+}
+
+model Account {
+  id           String   @id @default(cuid())
+  role         Role     @default(CLIENT)
+  company      String
+  contactPerson String
+  phone        String
+  email        String   @unique
+  taxId        String?
+  itf263Ref    String?
+  itf263Expiry DateTime?
+  createdAt    DateTime @default(now())
+  quotes       Quote[]
+  orders       Order[]
+}
+
+model Product {
+  id          String  @id // e.g. "jewel-12", "bc-qr"
+  category    String
+  name        String
+  specs       String
+  basePriceUsd Float
+  unit        String
+  minQty      Int
+  orders      OrderItem[]
+}
+
+model StockMaterial {
+  id        String @id // "gsm300-gloss" | "gsm300-matt"
+  label     String
+  weightGsm Int    @default(300)
+  qtySheets Int    @default(0)
+}
+
+model Quote {
+  id         String      @id // PMS-… tracking ref
+  accountId  String
+  account    Account     @relation(fields: [accountId], references: [id])
+  payload    Json // canonical lines, delivery, notes
+  totalUsd   Float
+  hash       String      @unique // SHA-256 of canonical payload
+  status     QuoteStatus @default(DRAFT)
+  renewedFrom String?
+  createdAt  DateTime    @default(now())
+
+  @@index([accountId])
+}
+
+model Order {
+  id          String     @id // PMS-… tracking ref
+  accountId   String
+  account     Account    @relation(fields: [accountId], references: [id])
+  customJson  Json? // jewel-calendar config / QR bindings
+  stage       OrderStage @default(RECEIVED)
+  pickupToken String     @unique
+  items       OrderItem[]
+  milestones  Milestone[]
+  createdAt   DateTime   @default(now())
+
+  @@index([accountId])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  qty       Int
+  unitPrice Float
+}
+
+model Milestone {
+  id        String     @id @default(cuid())
+  orderId   String
+  order     Order      @relation(fields: [orderId], references: [id])
+  stage     OrderStage
+  channel   String // "sse" | "push" | "whatsapp" | "sms"
+  createdAt DateTime   @default(now())
+}
+
+model QrLink {
+  id        String   @id // 8-char redirect id (printmadesimple.co.zw/q/{id})
+  target    String // retargetable without reprint
+  label     String
+  orderId   String?
+  scans     Int      @default(0)
+  createdAt DateTime @default(now())
+}
