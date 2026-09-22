@@ -33,7 +33,16 @@ export default defineConfig({
         ]
       },
       workbox: {
+        cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        globIgnores: [
+          'assets/docs-*.js',
+          'assets/html2canvas-*.js',
+          'assets/index.es-*.js',
+          'assets/import-wrapper-*.js',
+          'assets/purify*.js',
+          'assets/browser-*.js',
+        ],
         runtimeCaching: [
           {
             // Cache-First: static UI assets, fonts, app shell
