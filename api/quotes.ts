@@ -5,7 +5,37 @@
 // (format + expiry) is enforced again server-side. Persists to Neon via Prisma.
 import { PrismaNeon } from '@prisma/adapter-neon'
 import { PrismaClient } from '@prisma/client'
-import { canonicalQuote, checkZimra, sha256Hex } from '../src/lib/security'
+
+// NOTE: mirrors src/lib/security.ts (sha256Hex/canonicalQuote/checkZimra).
+// Duplicated deliberately: Vercel Node functions run unbundled as native ESM,
+// so relative TS imports without extensions fail at runtime (ERR_MODULE_NOT_FOUND).
+// Keep both copies in sync — they are small, pure, dependency-free.
+async function sha256Hex(input: string): Promise<string> {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+function canonicalQuote(p: {
+  ref: string; company: string; contactPerson: string; phone: string; email: string
+  taxId: string; itf263Ref: string; delivery: string
+  items: { desc: string; qty: number; unitPrice: number }[]; notes: string
+}): string {
+  const items = p.items.map(i => `${i.desc}|${i.qty}|${i.unitPrice}`).join(';')
+  return [p.ref, p.company, p.contactPerson, p.phone, p.email, p.taxId, p.itf263Ref, p.delivery, items, p.notes]
+    .join('§')
+}
+
+function checkZimra(itf263Ref: string, expiryISO: string): { ok: boolean; reason?: string } {
+  const ref = itf263Ref.trim()
+  if (!ref) return { ok: false, reason: 'ITF263 reference is required.' }
+  if (!/^[0-9]{6,20}$/.test(ref.replace(/\s/g, '')))
+    return { ok: false, reason: 'ITF263 ref must be 6–20 digits.' }
+  if (!expiryISO) return { ok: false, reason: 'Tax clearance expiry date is required.' }
+  const exp = new Date(expiryISO + 'T23:59:59')
+  if (isNaN(exp.getTime())) return { ok: false, reason: 'Invalid expiry date.' }
+  if (exp.getTime() < Date.now()) return { ok: false, reason: 'Tax clearance is EXPIRED — quote cannot be marked Compliant.' }
+  return { ok: true }
+}
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
 
