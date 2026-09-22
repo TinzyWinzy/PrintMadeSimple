@@ -19,7 +19,9 @@ function prisma() {
   return globalForPrisma.prisma
 }
 
-export default async function handler(req: Request) {
+// NOTE: named POST export — Vercel Node functions ignore a default export
+// that returns a Response (caught from production logs).
+export async function POST(req: Request) {
   if (req.method !== 'POST') return Response.json({ error: 'POST only' }, { status: 405 })
   let body: any
   try {
