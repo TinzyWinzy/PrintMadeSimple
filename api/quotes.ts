@@ -39,11 +39,22 @@ function checkZimra(itf263Ref: string, expiryISO: string): { ok: boolean; reason
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
 
+function dbUrl(): string {
+  // Prefer explicit DATABASE_URL; fall back to Neon-integration pooled strings.
+  const v =
+    process.env.DATABASE_URL ||
+    process.env.STORAGE_POSTGRES_PRISMA_URL ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.STORAGESEV_PRISMA_DATABASE_URL ||
+    ''
+  if (!v) throw new Error('DATABASE_URL is not set')
+  return v
+}
+
 function prisma() {
-  if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not set')
   if (!globalForPrisma.prisma) {
     globalForPrisma.prisma = new PrismaClient({
-      adapter: new PrismaNeon({ connectionString: process.env.DATABASE_URL }),
+      adapter: new PrismaNeon({ connectionString: dbUrl() }),
     })
   }
   return globalForPrisma.prisma
