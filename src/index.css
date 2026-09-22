@@ -72,6 +72,12 @@ body { @apply bg-white text-neutral-900 antialiased; font-family: Inter, system-
   .hero-in, .hero-in-d1, .hero-in-d2 { animation: none; }
 }
 
+/* Full-viewport breakout for band sections inside a contained column.
+   Margin-based (not transform) so `fixed` descendants keep working. */
+.breakout { margin-left: calc((100% - 100vw) / 2); margin-right: calc((100% - 100vw) / 2); }
+
+html, body { overflow-x: clip; }
+
 /* Dot-grid texture (Traamand-style, pure CSS) */
 .dotgrid {
   background-image: radial-gradient(currentColor 1px, transparent 1.5px);

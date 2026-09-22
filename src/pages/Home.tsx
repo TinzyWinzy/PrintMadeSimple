@@ -11,7 +11,7 @@ const WA = (msg: string) => `https://wa.me/${BUSINESS.primaryWhatsapp.replace('+
 export default function Home() {
   useReveals()
   return (
-    <div className="pb-24">
+    <div className="pb-24 breakout">
       <UtilityStrip />
       <Hero />
       <Ticker />
@@ -35,7 +35,7 @@ export default function Home() {
 /* 1 · Utility strip — hairline, mono, left-aligned */
 function UtilityStrip() {
   return (
-    <p className="chip-mono uppercase text-neutral-500 border-b border-neutral-200 pb-2 -mt-1">
+    <p className="chip-mono uppercase text-neutral-500 border-b border-neutral-200 pb-2 -mt-1 max-w-6xl mx-auto px-4 sm:px-6 w-full">
       Shop 4B Regal Star Mall · Harare CBD · USD/ZiG · EcoCash · InnBucks · O'Mari
     </p>
   )
@@ -44,9 +44,9 @@ function UtilityStrip() {
 /* 2 · Hero — full-bleed ink band, split, oversized display */
 function Hero() {
   return (
-    <section aria-label="Print Made Simple" className="bg-neutral-950 text-white -mx-4 px-4 pt-8 pb-10 mt-3 relative overflow-hidden">
+    <section aria-label="Print Made Simple" className="bg-neutral-950 text-white pt-8 pb-10 mt-3 relative overflow-hidden">
       <div className="dotgrid absolute inset-0 text-white/10 pointer-events-none" aria-hidden="true" />
-      <div className="relative grid gap-6 sm:grid-cols-[1.2fr_1fr] sm:items-end">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 grid gap-6 lg:grid-cols-[1.15fr_1fr] lg:items-center lg:py-6">
         <div>
           <p className="kicker text-red-400">Designing · Printing · Branding</p>
           <h1 className="display mt-2 hero-in">
@@ -84,7 +84,7 @@ function Ticker() {
   ]
   const row = [...items, ...items]
   return (
-    <div className="bg-[#E30613] text-white -mx-4 px-0 py-2.5 overflow-hidden mt-0" aria-label="Indicative prices">
+    <div className="bg-[#E30613] text-white py-2.5 overflow-hidden mt-0" aria-label="Indicative prices">
       <div className="marquee-track gap-8 pr-8">
         {row.map(([n, p], i) => (
           <span key={i} className="chip-mono font-bold uppercase whitespace-nowrap">
@@ -106,7 +106,7 @@ const SPECS = [
 
 function Showcase() {
   return (
-    <section aria-label="Jewel Case Desk Calendar" className="pt-8 rv">
+    <section aria-label="Jewel Case Desk Calendar" className="pt-8 rv max-w-6xl mx-auto px-4 sm:px-6 w-full">
       <p className="kicker text-[#E30613]">Flagship — 365-day advertising stand</p>
       <h2 className="display mt-1" style={{ fontSize: 'clamp(2rem, 1.2rem + 7vw, 3.2rem)' }}>THE JEWEL<br />CASE CALENDAR</h2>
       <div className="grid gap-4 mt-4 sm:grid-cols-[1fr_1.1fr]">
@@ -135,7 +135,8 @@ function B2BSteps() {
   const [vol, setVol] = useState('200')
   const [tax, setTax] = useState('')
   return (
-    <section aria-label="Corporate quotes" className="bg-slate-100 -mx-4 px-4 py-8 mt-8 rv">
+    <section aria-label="Corporate quotes" className="bg-slate-100 py-8 mt-8 rv">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
       <p className="kicker text-neutral-500">{BUSINESS.name}</p>
       <h2 className="display mt-1" style={{ fontSize: 'clamp(1.9rem, 1.1rem + 6vw, 2.8rem)' }}>TENDER-READY<br />IN 3 STEPS</h2>
       <div className="grid gap-2 mt-4 sm:grid-cols-3">
@@ -162,6 +163,7 @@ function B2BSteps() {
         ))}
       </div>
       <p className="text-xs text-neutral-500 mt-2">PRAZ-ready format · SHA-256 sealed · ZIMRA clearance checked before finalizing.</p>
+      </div>
     </section>
   )
 }
@@ -171,7 +173,7 @@ const GRID = ['jewel-12', 'bc-qr', 'flyer-a5', 'sticker-vinyl', 'banner-pvc', 'c
 
 function Index() {
   return (
-    <section aria-label="Product index" className="pt-8 rv">
+    <section aria-label="Product index" className="pt-8 rv max-w-6xl mx-auto px-4 sm:px-6 w-full">
       <p className="kicker text-[#E30613]">Full range</p>
       <h2 className="display mt-1" style={{ fontSize: 'clamp(1.9rem, 1.1rem + 6vw, 2.8rem)' }}>PRICE INDEX</h2>
       <ul className="mt-2 border-t-2 border-neutral-900">
@@ -196,7 +198,7 @@ function Index() {
 /* 7 · Trust footnote */
 function TrustFoot() {
   return (
-    <section aria-label="Trust and payments" className="border-t-2 border-neutral-900 mt-8 pt-3 rv">
+    <section aria-label="Trust and payments" className="border-t-2 border-neutral-900 mt-8 pt-3 rv max-w-6xl mx-auto px-4 sm:px-6 w-full">
       <div className="grid gap-3 sm:grid-cols-2 text-sm">
         <div>
           <p className="kicker text-neutral-500">Fulfillment</p>
@@ -229,7 +231,8 @@ function TrackerBand() {
     setRes(`${hit.kind} ${hit.ref} — ${STAGES[stage]}${hit.payload?.pickupToken ? ` · pickup ${hit.payload.pickupToken}` : ''}`)
   }
   return (
-    <section aria-label="Track your order" className="bg-neutral-950 text-white -mx-4 px-4 py-8 mt-8 rv">
+    <section aria-label="Track your order" className="bg-neutral-950 text-white py-8 mt-8 rv">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
       <p className="kicker text-red-400">Production tracker</p>
       <h2 className="display mt-1" style={{ fontSize: 'clamp(1.9rem, 1.1rem + 6vw, 2.8rem)' }}>WHERE'S<br />MY ORDER?</h2>
       <form onSubmit={lookup} className="flex gap-2 mt-4">
@@ -238,6 +241,7 @@ function TrackerBand() {
       </form>
       {res && <p className="text-sm bg-white/10 border border-white/20 px-3 py-2.5 mt-2">{res}</p>}
       <Link to="/track" className="inline-block mt-2 text-sm font-bold underline underline-offset-4">Open full tracker →</Link>
+      </div>
     </section>
   )
 }
@@ -253,7 +257,7 @@ function InstallCard() {
   }, [])
   if (!deferred || done) return null
   return (
-    <section className="border-2 border-neutral-900 p-4 mt-6 flex items-center gap-3 no-print">
+    <section className="border-2 border-neutral-900 p-4 mt-6 max-w-6xl mx-auto px-4 sm:px-6 w-full flex items-center gap-3 no-print">
       <p className="text-sm flex-1"><strong>Install the app.</strong> Offline catalog + calendar designer, zero data-cost relaunches.</p>
       <button onClick={async () => { await deferred.prompt(); setDone(true) }} className="bg-neutral-900 text-white font-black px-6 py-3 shrink-0 min-h-[52px]">
         INSTALL
