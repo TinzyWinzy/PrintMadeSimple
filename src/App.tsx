@@ -71,7 +71,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         <div className="h-[3px] bg-neutral-950" aria-hidden="true" />
       </header>
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-4 pb-40 sm:pb-4">{children}</main>
-      <nav className="fixed bottom-0 inset-x-0 z-40 grid grid-cols-5 bg-white border-t border-neutral-200 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] sm:hidden no-print" aria-label="Mobile">
+      <nav className="fixed bottom-0 inset-x-0 z-40 grid grid-cols-5 h-14 bg-white border-t border-neutral-200 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] sm:hidden no-print" aria-label="Mobile">
         {LINKS.map(([to, label, number]) => (
           <NavLink key={to} to={to} end={to === '/'}
             className={({ isActive }) => `flex min-w-0 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-bold leading-none ${isActive ? 'text-[#E30613]' : 'text-neutral-500'}`}>

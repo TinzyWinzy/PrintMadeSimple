@@ -9,6 +9,12 @@
 html { -webkit-tap-highlight-color: transparent; }
 body { @apply bg-white text-neutral-900 antialiased; font-family: Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
 
+button, a, input, select, textarea { touch-action: manipulation; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid rgba(227, 6, 19, 0.28);
+  outline-offset: 2px;
+}
+
 /* Display face — Archivo Black when network allows, system black fallback */
 .display, .font-display {
   font-family: "Archivo Black", "Arial Black", system-ui, sans-serif;
