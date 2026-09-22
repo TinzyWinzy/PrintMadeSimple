@@ -7,33 +7,22 @@ import jewelFlyer from '../assets/jewel-flyer.webp'
 
 const WA = (msg: string) => `https://wa.me/${BUSINESS.primaryWhatsapp.replace('+', '')}?text=${encodeURIComponent(msg)}`
 
-function Stamp({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-block border-2 border-neutral-900 rounded px-2 py-0.5 text-[11px] font-black uppercase tracking-wider -rotate-1 bg-white">
-      {children}
-    </span>
-  )
-}
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h2 className="font-black text-lg tracking-tight">{children}</h2>
-}
-
 export default function Home() {
   return (
-    <div className="space-y-6 pb-24">
-      <UtilityBar />
+    <div className="pb-24">
+      <UtilityStrip />
       <Hero />
+      <Ticker />
       <Showcase />
-      <B2BTeaser />
-      <CategoryGrid />
-      <TrustStrip />
-      <TrackerTeaser />
+      <B2BSteps />
+      <Index />
+      <TrustFoot />
+      <TrackerBand />
       <InstallCard />
       <div className="fixed bottom-0 inset-x-0 no-print">
         <div className="max-w-3xl mx-auto px-4 pb-4 pt-6 bg-gradient-to-t from-white via-white to-transparent">
-          <a href={WA('Hello Print Made Simple! I want to order.')} className="block bg-green-600 text-white text-center rounded-full py-3 font-black min-h-[52px]">
-            WhatsApp {BUSINESS.phones[0].display}
+          <a href={WA('Hello Print Made Simple! I want to order.')} className="block bg-green-600 text-white text-center rounded-sm py-3 font-black min-h-[52px]">
+            WHATSAPP {BUSINESS.phones[0].display}
           </a>
         </div>
       </div>
@@ -41,150 +30,191 @@ export default function Home() {
   )
 }
 
-/* 1 · Utility bar */
-function UtilityBar() {
+/* 1 · Utility strip — hairline, mono, left-aligned */
+function UtilityStrip() {
   return (
-    <div className="bg-slate-100 border rounded-2xl px-3 py-2 text-xs space-y-0.5 -mt-1">
-      <p className="font-bold">Shop 4B Basement, Regal Star Mall, George Silundika Ave, Harare CBD</p>
-      <p className="text-neutral-600">{BUSINESS.phones[0].display} · USD & ZiG · EcoCash · InnBucks · O'Mari</p>
-    </div>
+    <p className="chip-mono uppercase text-neutral-500 border-b border-neutral-200 pb-2 -mt-1">
+      Shop 4B Regal Star Mall · Harare CBD · USD/ZiG · EcoCash · InnBucks · O'Mari
+    </p>
   )
 }
 
-/* 3 · Hero with 3-way actions */
+/* 2 · Hero — full-bleed ink band, split, oversized display */
 function Hero() {
   return (
-    <section aria-label="Start an order">
-      <h1 className="text-[28px] leading-[1.12] font-black tracking-tight">
-        Precision printing & branding — simple, fast, offline-ready.
-      </h1>
-      <p className="text-sm text-neutral-600 mt-1.5">
-        From <strong className="text-neutral-900">300gsm Jewel Case Desk Calendars</strong> to tender-compliant corporate stationery, printed in Harare CBD.
-      </p>
-      <div className="space-y-2 mt-3">
-        <Link to="/customizer" className="block bg-[#E30613] text-white rounded-2xl p-3.5 min-h-[64px]">
-          <span className="font-black block">Design a 365-day calendar</span>
-          <span className="text-sm opacity-90">Custom start month, logo on every page — start designing →</span>
-        </Link>
-        <div className="grid grid-cols-2 gap-2">
-          <Link to="/rfq" className="block border-2 border-neutral-900 rounded-2xl p-3 min-h-[64px]">
-            <span className="font-black block text-sm">B2B tender quote</span>
-            <span className="text-xs text-neutral-600">Hashed PDF in minutes →</span>
-          </Link>
-          <a href={WA('Hello! I have print-ready artwork to send.')} className="block border-2 border-neutral-900 rounded-2xl p-3 min-h-[64px]">
-            <span className="font-black block text-sm">Have artwork?</span>
-            <span className="text-xs text-neutral-600">Send it on WhatsApp →</span>
-          </a>
+    <section aria-label="Print Made Simple" className="bg-neutral-950 text-white -mx-4 px-4 pt-8 pb-10 mt-3 relative overflow-hidden">
+      <div className="dotgrid absolute inset-0 text-white/10 pointer-events-none" aria-hidden="true" />
+      <div className="relative grid gap-6 sm:grid-cols-[1.2fr_1fr] sm:items-end">
+        <div>
+          <p className="kicker text-red-400">Designing · Printing · Branding</p>
+          <h1 className="display mt-2">
+            INK ON<br />PAPER.<br />
+            <span className="text-[#FF3B47]">BRAND ON</span><br />DESKS.
+          </h1>
+          <p className="text-sm text-neutral-300 mt-3 max-w-[34ch]">
+            300gsm Jewel Case Desk Calendars and tender-ready corporate print — made in Harare CBD, ordered from your phone.
+          </p>
+          <div className="flex flex-wrap gap-2 mt-4">
+            <Link to="/customizer" className="bg-[#E30613] text-white font-black px-6 py-3 min-h-[52px] inline-flex items-center">
+              DESIGN A CALENDAR
+            </Link>
+            <Link to="/rfq" className="border border-white/40 font-bold px-6 py-3 min-h-[52px] inline-flex items-center">
+              B2B QUOTE
+            </Link>
+          </div>
         </div>
+        <figure className="relative">
+          <img src={jewelFlyer} alt="Jewel Case Desk Calendar samples printed by Print Made Simple" className="w-full border border-white/20 rotate-1" fetchPriority="high" />
+          <figcaption className="absolute -bottom-3 left-3 bg-white text-neutral-900 chip-mono font-bold uppercase px-2 py-1 -rotate-2">
+            from ${jewelCasePrice(100, 12, 'gloss').toFixed(2)} / 100 units
+          </figcaption>
+        </figure>
       </div>
     </section>
   )
 }
 
-/* 4 · Featured product showcase */
+/* 3 · Price ticker */
+function Ticker() {
+  const items = [
+    ['JEWEL CALENDAR', '$1.10/u'], ['QR BUSINESS CARDS', '$8/100'], ['A3 DESK CALENDAR', '$3.50/u'],
+    ['A5 FLYERS', '$0.12/u'], ['PVC BANNER', '$12/m²'], ['VINYL STICKERS', '$0.25/u'],
+  ]
+  const row = [...items, ...items]
+  return (
+    <div className="bg-[#E30613] text-white -mx-4 px-0 py-2.5 overflow-hidden mt-0" aria-label="Indicative prices">
+      <div className="marquee-track gap-8 pr-8">
+        {row.map(([n, p], i) => (
+          <span key={i} className="chip-mono font-bold uppercase whitespace-nowrap">
+            {n} <span className="text-white/70">{p}</span> <span className="text-white/40 pl-6">///</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* 4 · Showcase — asymmetric split, numbered spec rows */
+const SPECS = [
+  ['01', '300gsm gloss or matt premium cardstock'],
+  ['02', 'Any month as Month 1 — zero surcharge'],
+  ['03', 'Full-colour logo on cover + all 12 pages'],
+  ['04', '4 special dates per month + Zim holidays'],
+]
+
 function Showcase() {
   return (
-    <section aria-label="Jewel Case Desk Calendar" className="space-y-2">
-      <SectionTitle>Jewel Case Desk Calendar</SectionTitle>
-      <img src={jewelFlyer} alt="Jewel Case Desk Calendar samples printed by Print Made Simple" className="w-full rounded-2xl border" loading="lazy" />
-      <ul className="grid grid-cols-2 gap-1.5 text-xs">
-        {['300gsm gloss or matt', 'Any start month, $0 extra', 'Logo on all 12 pages', '4 special dates / month'].map(s => (
-          <li key={s} className="bg-slate-100 rounded-xl px-2.5 py-2 font-semibold">{s}</li>
-        ))}
-      </ul>
-      <div className="flex items-center gap-2">
-        <span className="font-black text-lg">from USD {jewelCasePrice(100, 12, 'gloss').toFixed(2)}</span>
-        <span className="text-xs text-neutral-500">/ 100 units</span>
-        <Link to="/customizer" className="ml-auto bg-neutral-900 text-white rounded-full px-5 py-2.5 text-sm font-bold min-h-[44px]">Customize →</Link>
+    <section aria-label="Jewel Case Desk Calendar" className="pt-8">
+      <p className="kicker text-[#E30613]">Flagship — 365-day advertising stand</p>
+      <h2 className="display mt-1" style={{ fontSize: 'clamp(2rem, 1.2rem + 7vw, 3.2rem)' }}>THE JEWEL<br />CASE CALENDAR</h2>
+      <div className="grid gap-4 mt-4 sm:grid-cols-[1fr_1.1fr]">
+        <img src={jewelFlyer} alt="Jewel Case Desk Calendar range" className="w-full border-2 border-neutral-900 -rotate-1" loading="lazy" />
+        <ol>
+          {SPECS.map(([n, s]) => (
+            <li key={n} className="flex gap-3 items-baseline border-b border-neutral-200 py-2.5">
+              <span className="font-black text-[#E30613]">{n}</span>
+              <span className="text-sm font-semibold">{s}</span>
+            </li>
+          ))}
+          <li className="pt-3">
+            <Link to="/customizer" className="inline-flex items-center bg-neutral-900 text-white font-black px-6 py-3 min-h-[52px]">
+              CUSTOMIZE YOURS →
+            </Link>
+          </li>
+        </ol>
       </div>
     </section>
   )
 }
 
-/* 5 · B2B mini-form → prefilled RFQ */
-function B2BTeaser() {
+/* 5 · B2B — overlapping numbered badges, prefill handoff */
+function B2BSteps() {
   const nav = useNavigate()
   const [vol, setVol] = useState('200')
   const [tax, setTax] = useState('')
   return (
-    <section aria-label="Corporate quotes" className="bg-neutral-950 text-white rounded-2xl p-4 space-y-2.5">
-      <p className="text-[11px] font-black uppercase tracking-widest text-red-300">{BUSINESS.name}</p>
-      <SectionTitle>Corporate & tender quotes</SectionTitle>
-      <p className="text-sm opacity-80">PRAZ-ready hashed PDF. ZIMRA clearance checked before anything is finalized.</p>
-      <div className="grid grid-cols-2 gap-2">
-        <label className="text-xs">1 · Volume
-          <select value={vol} onChange={e => setVol(e.target.value)} className="text-neutral-900 rounded-lg w-full p-2.5 mt-1 font-bold">
-            <option value="100">±100 units</option>
-            <option value="200">±200 units</option>
-            <option value="500">±500 units</option>
-            <option value="1000">1000+ units</option>
-          </select>
-        </label>
-        <label className="text-xs">2 · Company Tax ID
-          <input value={tax} onChange={e => setTax(e.target.value)} placeholder="e.g. 20001234" className="text-neutral-900 rounded-lg w-full p-2.5 mt-1 font-bold" />
-        </label>
+    <section aria-label="Corporate quotes" className="bg-slate-100 -mx-4 px-4 py-8 mt-8">
+      <p className="kicker text-neutral-500">{BUSINESS.name}</p>
+      <h2 className="display mt-1" style={{ fontSize: 'clamp(1.9rem, 1.1rem + 6vw, 2.8rem)' }}>TENDER-READY<br />IN 3 STEPS</h2>
+      <div className="grid gap-2 mt-4 sm:grid-cols-3">
+        {[
+          <label key="v" className="block bg-white border border-neutral-300 p-3 text-xs font-bold uppercase tracking-wide" htmlFor="b2b-vol">Volume
+            <select id="b2b-vol" value={vol} onChange={e => setVol(e.target.value)} className="block w-full mt-1.5 text-base font-black normal-case p-2 border border-neutral-300 bg-white">
+              <option value="100">±100 units</option><option value="200">±200 units</option>
+              <option value="500">±500 units</option><option value="1000">1000+ units</option>
+            </select>
+          </label>,
+          <label key="t" className="block bg-white border border-neutral-300 p-3 text-xs font-bold uppercase tracking-wide" htmlFor="b2b-tax">Company Tax ID
+            <input id="b2b-tax" value={tax} onChange={e => setTax(e.target.value)} placeholder="20001234" className="block w-full mt-1.5 text-base font-black p-2 border border-neutral-300" />
+          </label>,
+          <button key="g" onClick={() => { sessionStorage.setItem('pms-prefill', JSON.stringify({ vol, tax })); nav('/rfq') }}
+            className="bg-[#E30613] text-white font-black p-3 text-left min-h-[76px]">
+            <span className="chip-mono block opacity-70">03</span>
+            GET HASHED PDF QUOTE →
+          </button>,
+        ].map((el, i) => (
+          <div key={i} className="relative">
+            <span className="absolute -top-2.5 left-2 z-10 bg-neutral-900 text-white chip-mono font-bold px-1.5 py-0.5">0{i + 1}</span>
+            {el}
+          </div>
+        ))}
       </div>
-      <button
-        onClick={() => { sessionStorage.setItem('pms-prefill', JSON.stringify({ vol, tax })); nav('/rfq') }}
-        className="w-full bg-[#E30613] rounded-full py-3 font-black min-h-[52px]">
-        3 · Continue to compliant quote →
-      </button>
+      <p className="text-xs text-neutral-500 mt-2">PRAZ-ready format · SHA-256 sealed · ZIMRA clearance checked before finalizing.</p>
     </section>
   )
 }
 
-/* 6 · Category grid with from-prices */
-const GRID: { id: string; blurb: string }[] = [
-  { id: 'jewel-12', blurb: 'Stand included' },
-  { id: 'bc-qr', blurb: 'Links to your vCard' },
-  { id: 'flyer-a5', blurb: 'Bulk breaks' },
-  { id: 'sticker-vinyl', blurb: 'Die-cut shapes' },
-  { id: 'banner-pvc', blurb: 'Events & shops' },
-  { id: 'corp-tshirt', blurb: 'Staff & promos' },
-]
+/* 6 · Product index — editorial rows, no cards */
+const GRID = ['jewel-12', 'bc-qr', 'flyer-a5', 'sticker-vinyl', 'banner-pvc', 'corp-tshirt']
 
-function CategoryGrid() {
+function Index() {
   return (
-    <section aria-label="Product categories" className="space-y-2">
-      <SectionTitle>What we print</SectionTitle>
-      <div className="grid grid-cols-2 gap-2">
-        {GRID.map(g => {
-          const p = PRODUCTS.find(x => x.id === g.id)!
+    <section aria-label="Product index" className="pt-8">
+      <p className="kicker text-[#E30613]">Full range</p>
+      <h2 className="display mt-1" style={{ fontSize: 'clamp(1.9rem, 1.1rem + 6vw, 2.8rem)' }}>PRICE INDEX</h2>
+      <ul className="mt-2 border-t-2 border-neutral-900">
+        {GRID.map(id => {
+          const p = PRODUCTS.find(x => x.id === id)!
           return (
-            <Link key={g.id} to="/catalog" className="border rounded-2xl p-3 bg-white min-h-[96px] flex flex-col">
-              <span className="font-bold text-sm leading-tight">{p.name}</span>
-              <span className="text-xs text-neutral-500">{g.blurb}</span>
-              <span className="mt-auto pt-1 font-black text-sm">from ${catalogPrice(p.basePriceUSD, p.minQty).toFixed(2)}</span>
-            </Link>
+            <li key={id} className="border-b border-neutral-200">
+              <Link to="/catalog" className="flex items-baseline gap-3 py-3 min-h-[56px]">
+                <span className="font-black text-base leading-tight flex-1">{p.name}</span>
+                <span className="chip-mono text-neutral-500 uppercase hidden sm:inline">{p.category}</span>
+                <span className="font-black whitespace-nowrap">from ${catalogPrice(p.basePriceUSD, p.minQty).toFixed(2)}</span>
+                <span className="font-black text-[#E30613]" aria-hidden="true">→</span>
+              </Link>
+            </li>
           )
         })}
-      </div>
+      </ul>
     </section>
   )
 }
 
-/* 7 · Trust, fulfillment, payments */
-function TrustStrip() {
+/* 7 · Trust footnote */
+function TrustFoot() {
   return (
-    <section aria-label="Trust and payments" className="space-y-2">
-      <SectionTitle>Collect with confidence</SectionTitle>
-      <div className="flex flex-wrap gap-1.5">
-        <Stamp>Express pickup · Shop 4B</Stamp>
-        <Stamp>Delivery arranged on WhatsApp</Stamp>
-        <Stamp>300 DPI pre-flight check</Stamp>
-      </div>
-      <div className="border rounded-2xl p-3 text-sm">
-        <p className="font-bold text-xs uppercase tracking-wide text-neutral-500">We accept</p>
-        <p className="font-black mt-0.5">EcoCash · InnBucks · O'Mari · USD cash</p>
+    <section aria-label="Trust and payments" className="border-t-2 border-neutral-900 mt-8 pt-3">
+      <div className="grid gap-3 sm:grid-cols-2 text-sm">
+        <div>
+          <p className="kicker text-neutral-500">Fulfillment</p>
+          <p className="font-bold mt-1">Express pickup — Shop 4B, Regal Star Mall</p>
+          <p className="text-neutral-600">Delivery arranged on WhatsApp · 300 DPI pre-flight on every file</p>
+        </div>
+        <div>
+          <p className="kicker text-neutral-500">We accept</p>
+          <p className="font-black mt-1 text-base">EcoCash · InnBucks · O'Mari · USD cash</p>
+          <p className="text-neutral-600 text-xs mt-0.5">{BUSINESS.phones.map(p => p.display).join(' · ')}</p>
+        </div>
       </div>
     </section>
   )
 }
 
-/* 8 · Tracker teaser — real IndexedDB lookup */
+/* 8 · Tracker band */
 const STAGES = ['Received', 'Proof ready', 'In production', 'Ready at Shop 4B']
 
-function TrackerTeaser() {
+function TrackerBand() {
   const [q, setQ] = useState('')
   const [res, setRes] = useState<string | null>(null)
   async function lookup(e: React.FormEvent) {
@@ -192,19 +222,20 @@ function TrackerTeaser() {
     const ref = q.trim().toUpperCase()
     if (!ref) return
     const hit = await db.designs.where('ref').equalsIgnoreCase(ref).first()
-    if (!hit) { setRes(`No order ${ref} on this device yet — it may live on another phone or with Shop 4B.`); return }
+    if (!hit) { setRes(`No ${ref} on this device — it may live on another phone or with Shop 4B.`); return }
     const stage = Math.min(STAGES.length - 1, hit.payload?.stage ?? 0)
-    setRes(`${hit.kind} ${hit.ref}: ${STAGES[stage]}${hit.payload?.pickupToken ? ` · pickup ${hit.payload.pickupToken}` : ''}`)
+    setRes(`${hit.kind} ${hit.ref} — ${STAGES[stage]}${hit.payload?.pickupToken ? ` · pickup ${hit.payload.pickupToken}` : ''}`)
   }
   return (
-    <section aria-label="Track your order" className="border rounded-2xl p-3.5 space-y-2">
-      <SectionTitle>Where's my order?</SectionTitle>
-      <form onSubmit={lookup} className="flex gap-2">
-        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Order ref e.g. PMS-..." className="border rounded-full px-3.5 py-2.5 text-sm flex-1 font-mono min-h-[48px]" aria-label="Order reference" />
-        <button className="bg-neutral-900 text-white rounded-full px-5 font-bold text-sm min-h-[48px]">Check</button>
+    <section aria-label="Track your order" className="bg-neutral-950 text-white -mx-4 px-4 py-8 mt-8">
+      <p className="kicker text-red-400">Production tracker</p>
+      <h2 className="display mt-1" style={{ fontSize: 'clamp(1.9rem, 1.1rem + 6vw, 2.8rem)' }}>WHERE'S<br />MY ORDER?</h2>
+      <form onSubmit={lookup} className="flex gap-2 mt-4">
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="REF e.g. PMS-..." className="bg-white/10 border border-white/30 px-4 py-3 text-sm flex-1 font-mono min-h-[52px] placeholder:text-neutral-500" aria-label="Order reference" />
+        <button className="bg-[#E30613] font-black px-6 min-h-[52px]">CHECK</button>
       </form>
-      {res && <p className="text-sm bg-slate-100 rounded-xl px-3 py-2">{res}</p>}
-      <Link to="/track" className="text-sm font-bold text-[#E30613]">Open full tracker →</Link>
+      {res && <p className="text-sm bg-white/10 border border-white/20 px-3 py-2.5 mt-2">{res}</p>}
+      <Link to="/track" className="inline-block mt-2 text-sm font-bold underline underline-offset-4">Open full tracker →</Link>
     </section>
   )
 }
@@ -220,12 +251,10 @@ function InstallCard() {
   }, [])
   if (!deferred || done) return null
   return (
-    <section className="bg-red-50 border border-red-200 rounded-2xl p-3.5 flex items-center gap-3 no-print">
-      <p className="text-sm flex-1"><strong>Install the app</strong> for offline catalog + calendar designer.</p>
-      <button
-        onClick={async () => { await deferred.prompt(); setDone(true) }}
-        className="bg-[#E30613] text-white rounded-full px-5 py-2.5 text-sm font-bold shrink-0 min-h-[44px]">
-        Install
+    <section className="border-2 border-neutral-900 p-4 mt-6 flex items-center gap-3 no-print">
+      <p className="text-sm flex-1"><strong>Install the app.</strong> Offline catalog + calendar designer, zero data-cost relaunches.</p>
+      <button onClick={async () => { await deferred.prompt(); setDone(true) }} className="bg-neutral-900 text-white font-black px-6 py-3 shrink-0 min-h-[52px]">
+        INSTALL
       </button>
     </section>
   )

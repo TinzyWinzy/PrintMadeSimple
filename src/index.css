@@ -16,6 +16,45 @@ body { @apply bg-white text-neutral-900 antialiased; }
 
 .calendar-grid { font-variant-numeric: tabular-nums; }
 
+/* Editorial display type — oversized, tight, left-aligned */
+.display {
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  font-size: clamp(2.6rem, 1.4rem + 9vw, 4.5rem);
+}
+.kicker {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+}
+.chip-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+/* Price ticker */
+@keyframes pms-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: pms-marquee 28s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}
+
+/* Dot-grid texture (Traamand-style, pure CSS) */
+.dotgrid {
+  background-image: radial-gradient(currentColor 1px, transparent 1.5px);
+  background-size: 14px 14px;
+}
+
 @media print {
   .no-print { display: none !important; }
 }
