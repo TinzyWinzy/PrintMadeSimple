@@ -84,12 +84,14 @@ model Order {
   id          String     @id // PMS-… tracking ref
   accountId   String
   account     Account    @relation(fields: [accountId], references: [id])
-  customJson  Json? // jewel-calendar config / QR bindings
-  stage       OrderStage @default(RECEIVED)
-  pickupToken String     @unique
-  items       OrderItem[]
-  milestones  Milestone[]
-  createdAt   DateTime   @default(now())
+  customJson      Json? // jewel-calendar config / QR bindings
+  stage           OrderStage @default(RECEIVED)
+  totalUsd        Float
+  pickupToken     String     @unique
+  idempotencyKey  String?    @unique
+  items           OrderItem[]
+  milestones      Milestone[]
+  createdAt       DateTime   @default(now())
 
   @@index([accountId])
 }
