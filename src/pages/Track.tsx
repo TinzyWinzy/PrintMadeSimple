@@ -4,6 +4,7 @@ import { BUSINESS } from '../data/business'
 import { rfqHash, whatsappOrderLink } from '../lib/engine'
 import { buildOrderMessage } from '../lib/docs-core'
 import { validPickupToken } from '../lib/security'
+import { flushOutbox } from '../lib/sync'
 
 const STAGES = ['Order Received / RFQ Submitted', 'Digital Proof Ready', 'Production Commenced', 'Ready for Collection (Harare hub)']
 // SSE/push milestones (SAD v2 §6) arrive server-side; until then the stage index
@@ -13,6 +14,7 @@ export default function Track() {
   const [items, setItems] = useState<SavedDesign[]>([])
   const [online, setOnline] = useState(navigator.onLine)
   const [tokenInput, setTokenInput] = useState<Record<number, string>>({})
+  const [syncResult, setSyncResult] = useState('')
 
   async function load() { setItems(await listDesigns()) }
   useEffect(() => {
@@ -48,6 +50,16 @@ export default function Track() {
     <div className="space-y-3">
       <h1 className="text-xl font-black">Track & outbox</h1>
       <p className={`text-xs rounded-full px-3 py-1 w-fit font-bold ${online ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>{online ? 'Online — you can dispatch' : 'Offline — drafts safe on this device'}</p>
+      {online && (
+        <button onClick={async () => {
+          const r = await flushOutbox()
+          setSyncResult(r.synced ? `Synced ${r.synced}, failed ${r.failed}${r.detail.length ? ': ' + r.detail.join('; ') : ''}` : `Nothing to sync${r.detail.length ? ' (' + r.detail.join('; ') + ')' : ''}`)
+          load()
+        }} className="bg-[#E30613] text-white rounded-full px-4 py-1.5 text-xs font-bold min-h-[40px]">
+          Sync now
+        </button>
+      )}
+      {syncResult && <p className="text-xs rounded bg-neutral-100 border border-neutral-200 px-2 py-1">{syncResult}</p>}
       {items.length === 0 && <p className="text-sm text-neutral-600 border rounded-2xl p-4">No drafts yet. Design a Jewel Case calendar or create an RFQ — it will appear here and survive load-shedding.</p>}
       {items.map(it => {
         const stage: number = it.payload?.stage ?? 0

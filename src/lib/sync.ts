@@ -2,6 +2,8 @@
 // Push locally-sealed quote/order to the server when online. Failures
 // (offline / 503 DB unavailable) are NOT fatal — the IndexedDB outbox remains
 // the source of truth and Track retries later.
+import { listDesigns, saveDesign } from './db'
+
 export interface OrderItem {
   productId: string
   qty: number
@@ -73,4 +75,39 @@ export async function getOrderStatus(ref: string, token?: string): Promise<{ ok:
   } catch {
     return { ok: false, error: 'offline' }
   }
+}
+
+// Dispatch every queued local design to the server when online. RFQ rows call
+// POST /api/quotes; order rows (with a quoteRef + hash) call POST /api/orders.
+// Successful rows flip to "sent"; the rest stay queued for retry.
+export async function flushOutbox(): Promise<{ synced: number; failed: number; detail: string[] }> {
+  if (!navigator.onLine) return { synced: 0, failed: 0, detail: ['offline'] }
+  const items = await listDesigns()
+  const queued = items.filter(d => d.status === 'queued')
+  let synced = 0
+  let failed = 0
+  const detail: string[] = []
+  for (const d of queued) {
+    try {
+      let res: { ok: boolean; error?: string }
+      if (d.kind === 'rfq' && typeof d.payload?.quoteHash === 'string') {
+        res = await pushQuote({ ...d.payload, ref: d.ref }, d.payload.quoteHash)
+      } else if (d.kind === 'order' && d.payload?.quoteRef && d.payload?.hash) {
+        res = await pushOrder(d.payload as unknown as OrderPayload, `order:${d.ref}`)
+      } else {
+        continue // jewel-calendar has no server intake yet
+      }
+      if (res.ok) {
+        await saveDesign({ ...d, status: 'sent' })
+        synced++
+      } else {
+        failed++
+        detail.push(`${d.ref}: ${res.error || 'unknown'}`)
+      }
+    } catch (e: any) {
+      failed++
+      detail.push(`${d.ref}: ${e?.message || 'error'}`)
+    }
+  }
+  return { synced, failed, detail }
 }
