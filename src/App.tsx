@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Link, NavLink, Route, Routes } from 'react-router-dom'
 import { BUSINESS } from './data/business'
+import Footer from './components/Footer'
 
 const Home = lazy(() => import('./pages/Home'))
 const Catalog = lazy(() => import('./pages/Catalog'))
@@ -80,15 +81,7 @@ function Shell({ children }: { children: React.ReactNode }) {
           </NavLink>
         ))}
       </nav>
-      <footer className="w-full pb-24 sm:pb-0 no-print">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-8 pt-2 text-xs text-neutral-600">
-          <p className="font-semibold text-neutral-800">{BUSINESS.name}</p>
-          <p>{BUSINESS.address}</p>
-          <p>{BUSINESS.emails.join(' · ')}</p>
-          <p>{BUSINESS.phones.map(p => p.display).join(' · ')}</p>
-          <p className="mt-1 opacity-70">Offline-first PWA · prices in USD indicative · pay on collection/delivery confirmation.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
