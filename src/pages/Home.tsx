@@ -4,6 +4,8 @@ import { BUSINESS, PRODUCTS } from '../data/business'
 import { catalogPrice, jewelCasePrice } from '../lib/engine'
 import { findDesignByRef } from '../lib/db'
 import { useReveals } from '../lib/reveal'
+import { ZIM_HOLIDAYS_2026 } from '../data/holidays'
+import CalendarSection from '../components/CalendarSection'
 import jewelFlyer from '../assets/jewel-flyer.webp'
 
 const WA = (msg: string) => `https://wa.me/${BUSINESS.primaryWhatsapp.replace('+', '')}?text=${encodeURIComponent(msg)}`
@@ -123,6 +125,12 @@ function Showcase() {
           </li>
         </ol>
       </div>
+      <CalendarSection
+        month={new Date().getMonth()}
+        year={new Date().getFullYear()}
+        brandName="Print Made Simple"
+        holidays={ZIM_HOLIDAYS_2026}
+      />
     </section>
   )
 }
